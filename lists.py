@@ -1,79 +1,9 @@
-state_list = [
-    "Andaman and Nicobar Islands",
-    "Andhra Pradesh",
-    "Arunachal Pradesh",
-    "Assam",
-    "Bihar",
-    "Chandigarh",
-    "Chhattisgarh",
-    "Dadra and Nagar Haveli and Daman and Diu",
-    "Delhi",
-    "Goa",
-    "Gujarat",
-    "Haryana",
-    "Himachal Pradesh",
-    "Jammu and Kashmir",
-    "Jharkhand",
-    "Karnataka",
-    "Kerala",
-    "Ladakh",
-    "Lakshadweep",
-    "Madhya Pradesh",
-    "Maharashtra",
-    "Manipur",
-    "Meghalaya",
-    "Mizoram",
-    "Nagaland",
-    "Odisha",
-    "Puducherry",
-    "Punjab",
-    "Rajasthan",
-    "Sikkim",
-    "Tamil Nadu",
-    "Telangana",
-    "Tripura",
-    "Uttar Pradesh",
-    "Uttarakhand",
-    "West Bengal"
-]
+import pandas as pd
 
-sector_list = [
-    "Agriculture", 
-    "Automotive", 
-    "Aviation & Defence", 
-    "Banking and Financial Services",
-    "Building Materials", 
-    "Chemical Industry", 
-    "Consulting Services", 
-    "Diversified Conglomerates", 
-    "FMCG (Fast-Moving Consumer Goods)", 
-    "Gems & Jewellery", 
-    "Global Capability Centres (GCCs)",
-    "Healthcare", 
-    "Housing", 
-    "Infrastructure & Construction", 
-    "IT and Software Development", 
-    "Leather and Products", 
-    "Logistics & Supply Chain",
-    "Manufacturing & Industrial", 
-    "Media, Entertainment & Education", 
-    "Metals & Mining", 
-    "Oil, Gas & Energy", 
-    "Pharmaceutical", 
-    "Renewable Energy",
-    "Retail & Consumer Durables", 
-    "Semiconductors",
-    "Sports", 
-    "Telecom", 
-    "Textile Manufacturing", 
-    "Travel & Hospitality",
-    "Finance",
-    "Cement & Building Materials"
-]
-field_list = ["Work From Home",
-              "Any",
-              "West Bengal",
-              "Maharashtra",
-              "Delhi",
-              "Karnataka"
-         ]
+df = pd.read_csv('internships.csv')
+
+location_list = df["location"].dropna().unique().tolist().sort()
+sector_list = df["sector_name"].dropna().unique().tolist().sort()
+field_list = df["field_name"].dropna().unique().tolist().sort()
+
+

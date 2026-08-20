@@ -19,7 +19,7 @@ st.divider()
 
 with st.form(key="form"):
     Eligible = st.checkbox("Are you Eligible?")
-    state = st.multiselect("Preferred States",lists.state_list)
+    state = st.multiselect("Preferred States",lists.location_list)
     sector = st.multiselect("Target Sectors",lists.sector_list)
     field = st.multiselect("Target Fields",lists.field_list)
     skills = st.text_area("Key Skills & Interests",placeholder="e.g., Python, Java, C++, AI, Machine Learning, Accounting, Computer Networking...")
