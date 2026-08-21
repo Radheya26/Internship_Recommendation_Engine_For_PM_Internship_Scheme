@@ -4,6 +4,7 @@ import pandas as pd
 import lists
 from fastembed import TextEmbedding
 
+MATCH_THRESHOLD = 60
 
 def load_css(file_name):
     with open(file_name) as f:
@@ -67,13 +68,24 @@ if submitted:
 
         for index, row in results.iterrows():
     
-    # Create a bordered container for each card
             with st.container(border=True):
         
-        # --- Header Section ---
-                st.subheader(f"✨ {row['internship_title']}")
-                st.markdown(f"**🏢 {row['company_name']}** &nbsp; | &nbsp; 📍 {row['location']}")
-        
+                # --- Header Section ---
+                title_col, score_col = st.columns([3, 1])
+                with title_col:
+                    st.subheader(f"✨ {row['internship_title']}")
+                    st.markdown(f"**🏢 {row['company_name']}** &nbsp; | &nbsp; 📍 {row['location']}")
+                                
+                with score_col:
+                    score = row['similarity_score']
+                    if pd.notna(score) and score*100 >= MATCH_THRESHOLD:
+                                 # Using HTML to right-align and color the text green
+                        st.markdown(f"<h4 style='text-align: right; color: #2e7d32;'>🔥 {score*100:.2f}% Match</h4>", 
+                                        unsafe_allow_html=True
+                                    )
+
+
+
                 # --- Quick Stats Columns ---
                 col1, col2, col3 = st.columns(3)
                 with col1:
