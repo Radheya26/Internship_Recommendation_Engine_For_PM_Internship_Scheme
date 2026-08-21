@@ -61,7 +61,41 @@ if submitted:
         with st.spinner("Finding Internships"):
             results = get_top_matches(combined_query , top_k=top_k)
         st.success(f"Found top {top_k} matches!")
-        st.dataframe(results,use_container_width=True)
+        st.balloons()
+        #st.dataframe(results,width='stretch')
+        #print(type(results))
+
+        for index, row in results.iterrows():
+    
+    # Create a bordered container for each card
+            with st.container(border=True):
+        
+        # --- Header Section ---
+                st.subheader(f"✨ {row['internship_title']}")
+                st.markdown(f"**🏢 {row['company_name']}** &nbsp; | &nbsp; 📍 {row['location']}")
+        
+                # --- Quick Stats Columns ---
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.caption("📅 Start Date")
+                    st.write(row['start_date'])
+                with col2:
+                    st.caption("⏳ Duration")
+                    st.write(row['duration'])
+                with col3:
+                    st.caption("💰 Stipend")
+                    st.write(row['stipend'])
+                    
+                # --- Tags / Skills Section ---
+                st.markdown(f"**Sector:** {row['sector_name']} &nbsp; | &nbsp; **Field:** {row['field_name']}")
+                st.markdown(f"**🛠️ Skills Required:** `{row['skills_set']}`")
+                
+                # --- Expandable Description ---
+                with st.expander("Read Detailed Description"):
+                    st.write(row['detailed_description'])
+                    # You can also add an "Apply Now" button here
+                    if st.button("Apply Now", key=f"apply_{index}"):
+                        st.success(f"Application started for {row['company_name']}!")
 
 
 
