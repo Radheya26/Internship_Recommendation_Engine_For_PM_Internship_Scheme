@@ -80,7 +80,7 @@ if submitted:
                     score = row['similarity_score']
                     if pd.notna(score) and score*100 >= MATCH_THRESHOLD:
                                  # Using HTML to right-align and color the text green
-                        st.markdown(f"<h4 style='text-align: right; color: #2e7d32;'>🔥 {score*100:.2f}% Match</h4>", 
+                        st.markdown(f"<h4 style='text-align: right; color: #2e7d32;'>🔥 {score*100:.1f}% Match</h4>", 
                                         unsafe_allow_html=True
                                     )
 
