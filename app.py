@@ -1,8 +1,9 @@
 import streamlit as st
-import numpy as np
 import pandas as pd 
 import lists
-from fastembed import TextEmbedding
+import requests
+
+backend_url = "http://127.0.0.1:8000/get_internship"
 
 MATCH_THRESHOLD = 60
 
@@ -11,28 +12,6 @@ def load_css(file_name):
         st.markdown(f"<style>{f.read()}</style>",unsafe_allow_html=True)
 
 load_css("style.css")
-
-@st.cache_resource
-def load_search_engine():
-    df = pd.read_csv("internships.csv")
-    doc_embeddings = np.load("documents_embedding.npy")
-
-    model = TextEmbedding()
-    return df , doc_embeddings , model
-
-df , doc_embeddings , model = load_search_engine()
-
-def get_top_matches(query_text:str , top_k:int =5):
-    query_vector = np.array(list(model.embed([query_text]))[0])
-    similarity_scores =np.dot(doc_embeddings , query_vector)
-
-    top_indices = np.argsort(similarity_scores)[::-1][:top_k]
-
-    results = df.iloc[top_indices].copy()
-    results['similarity_score'] = similarity_scores[top_indices]
-
-    return results
-
 
 
 
@@ -53,61 +32,69 @@ with st.form(key="form"):
     
 
 if submitted:
-    query_parts = [location , sector , field , skills]
-    combined_query = " ".join([str(part).strip() for part in query_parts if part and str(part).strip()])
 
-    if not combined_query:
-        st.warning("Please fill at least one field before searching.")
-    else:
-        with st.spinner("Finding Internships"):
-            results = get_top_matches(combined_query , top_k=top_k)
-        st.success(f"Found top {top_k} matches!")
-        st.balloons()
-        #st.dataframe(results,width='stretch')
-        #print(type(results))
-
-        for index, row in results.iterrows():
-    
-            with st.container(border=True):
+        user_input = {"location":location , "sector":sector , "field":field , "skills":skills , "top_k":top_k}
         
-                # --- Header Section ---
-                title_col, score_col = st.columns([3, 1])
-                with title_col:
-                    st.subheader(f"✨ {row['internship_title']}")
-                    st.markdown(f"**🏢 {row['company_name']}** &nbsp; | &nbsp; 📍 {row['location']}")
-                                
-                with score_col:
-                    score = row['similarity_score']
-                    if pd.notna(score) and score*100 >= MATCH_THRESHOLD:
-                                 # Using HTML to right-align and color the text green
-                        st.markdown(f"<h4 style='text-align: right; color: #2e7d32;'>🔥 {score*100:.1f}% Match</h4>", 
-                                        unsafe_allow_html=True
-                                    )
+        if not user_input["location"] and not user_input["sector"] and not user_input["field"] and not user_input["skills"]:
+            st.warning("Atleast fill some input fields...")
+        else:
+      
+            with st.spinner("Finding Internships"):
 
 
+                response = requests.post(backend_url , json=user_input)
+            if response.status_code == 200:
+                data = response.json()
 
-                # --- Quick Stats Columns ---
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    st.caption("📅 Start Date")
-                    st.write(row['start_date'])
-                with col2:
-                    st.caption("⏳ Duration")
-                    st.write(row['duration'])
-                with col3:
-                    st.caption("💰 Stipend")
-                    st.write(row['stipend'])
-                    
-                # --- Tags / Skills Section ---
-                st.markdown(f"**Sector:** {row['sector_name']} &nbsp; | &nbsp; **Field:** {row['field_name']}")
-                st.markdown(f"**🛠️ Skills Required:** `{row['skills_set']}`")
+                st.success(f"Found top {top_k} matches!")
+                st.balloons()
+                #st.dataframe(results,width='stretch')
+                #print(type(results))
+                #st.write(data)
                 
-                # --- Expandable Description ---
-                with st.expander("Read Detailed Description"):
-                    st.write(row['detailed_description'])
-                    # You can also add an "Apply Now" button here
-                    if st.button("Apply Now", key=f"apply_{index}"):
-                        st.success(f"Application started for {row['company_name']}!")
+                for item in data:
+            
+                    with st.container(border=True):
+                
+                        # --- Header Section ---
+                        title_col, score_col = st.columns([3, 1])
+                        with title_col:
+                            st.subheader(f"✨ {item.get('internship_title')}")
+                            st.markdown(f"**🏢 {item.get('company_name')}** &nbsp; | &nbsp; 📍 {item.get('location')}")
+                                        
+                        with score_col:
+                            score = item.get('similarity_score')
+                            if pd.notna(score) and score*100 >= MATCH_THRESHOLD:
+                                        # Using HTML to right-align and color the text green
+                                st.markdown(f"<h4 style='text-align: right; color: #2e7d32;'>🔥 {score*100:.1f}% Match</h4>", 
+                                                unsafe_allow_html=True
+                                            )
+
+
+
+                        # --- Quick Stats Columns ---
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            st.caption("📅 Start Date")
+                            st.write(item.get('start_date'))
+                        with col2:
+                            st.caption("⏳ Duration")
+                            st.write(item.get('duration'))
+                        with col3:
+                            st.caption("💰 Stipend")
+                            st.write(item.get('stipend'))
+                            
+                        # --- Tags / Skills Section ---
+                        st.markdown(f"**Sector:** {item.get('sector_name')} &nbsp; | &nbsp; **Field:** {item.get('field_name')}")
+                        st.markdown(f"**🛠️ Skills Required:** `{item.get('skills_set')}`")
+                        
+                        # --- Expandable Description ---
+                        with st.expander("Read Detailed Description"):
+                            st.write(item.get('detailed_description'))
+
+            elif response.status_code == 400:
+                st.warning("Fill atleast some input")
+                            
 
 
 

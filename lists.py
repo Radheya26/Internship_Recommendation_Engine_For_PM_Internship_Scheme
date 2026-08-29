@@ -1,6 +1,6 @@
 import pandas as pd
 
-df = pd.read_csv('internships.csv')
+df = pd.read_csv("src\internships.csv")
 
 location_list = df["location"].dropna().unique().tolist()
 location_list.sort()
