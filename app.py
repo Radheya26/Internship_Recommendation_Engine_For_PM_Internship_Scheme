@@ -11,14 +11,18 @@ def load_css(file_name):
     with open(file_name) as f:
         st.markdown(f"<style>{f.read()}</style>",unsafe_allow_html=True)
 
-load_css("style.css")
+#load_css("style.css")
 
 
 
 
 
-st.title("[ Internship Recommendation Engine ✨⚙️ ]")
-st.divider()
+st.title("Internship Recommendation Engine For PM Internship Scheme✨⚙️")
+#st.divider()
+st.caption("Created by Team Radheya - SIH 26 ",text_alignment="left")
+st.write("")
+
+
 
 
 with st.form(key="form"):
